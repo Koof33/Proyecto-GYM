@@ -1,0 +1,51 @@
+package com.gym.usuarios.model;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Entity
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Table(name = "usuario")
+
+public class Usuario {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idUsuario;
+    @Column(unique = true, length = 13)
+    private String rut;
+    @Column(length = 50, nullable = false)
+    private String pnombre;
+    @Column(length = 50, nullable = false)
+    private String snombre;
+    @Column(length = 50, nullable = false)
+    private String appaterno;
+    @Column(length = 50, nullable = false)
+    private String apmaterno;
+    @Column(length = 30, nullable = false, unique = true)
+    private String correo;
+    @Column(nullable = false)
+    private String clave;
+
+    @ManyToOne
+    @JoinColumn(name = "id_rol")
+    @JsonIgnoreProperties("usuario")
+    private Rol rol;
+
+    @ManyToOne
+    @JoinColumn(name = "id_estado")
+    @JsonIgnoreProperties("usuario")
+    private EstadoUsuario estado;
+}
