@@ -1,0 +1,13 @@
+package com.gym.gestionperfil.repository;
+
+import com.gym.gestionperfil.model.BloqueDisponibilidad;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+
+@Repository
+public interface BloqueDisponibilidadRepository extends JpaRepository<BloqueDisponibilidad, Long> {
+    List<BloqueDisponibilidad> findByIdUsuario(Long idUsuario);
+}
+
