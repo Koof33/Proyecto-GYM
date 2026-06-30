@@ -5,6 +5,11 @@ import com.gym.usuarios.security.RoleValidator;
 import com.gym.usuarios.service.EstadoUsuarioService;
 import com.gym.usuarios.service.RolService;
 import com.gym.usuarios.service.UsuarioService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+
 import com.gym.usuarios.model.Rol;
 import com.gym.usuarios.model.Usuario;
 
@@ -38,6 +43,20 @@ public class UsuariosController {
     @Autowired
     private RoleValidator roleValidator;
 
+//
+
+    @Operation(
+        summary = "Listar usuarios",
+        description = "Obtiene una lista con todas los Usuarios registradas en el sistema"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
+
     @GetMapping
     public ResponseEntity<List<Usuario>> mostrarUsuarios(HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -47,6 +66,18 @@ public class UsuariosController {
         }
         return ResponseEntity.ok(usuarios);
     }
+
+//
+    @Operation(
+        summary = "Buscar Usuario Por ID",
+        description = "Obtiene un usuario según su ID"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario obtenido correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
 
     @GetMapping("/id/{id}")
     public ResponseEntity<?> mostrarUsuario(@PathVariable Long id, HttpServletRequest request) {
@@ -59,6 +90,18 @@ public class UsuariosController {
         }
     }
 
+//
+    @Operation(
+        summary = "Buscar Usuario",
+        description = "Obtiene un usuario según su correo"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario obtenido correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @GetMapping("/correo/{correo}")
     public ResponseEntity<Usuario> buscarPorCorreoUsuario(@PathVariable String correo, HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -69,6 +112,18 @@ public class UsuariosController {
             return ResponseEntity.notFound().build();
         }
     }
+
+//
+    @Operation(
+        summary = "Buscar Usuario",
+        description = "Obtiene un usuario según su rut"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario obtenido correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
 
     @GetMapping("/rut/{rut}")
     public ResponseEntity<Usuario> buscarPorRut(@PathVariable String rut, HttpServletRequest request) {
@@ -81,6 +136,18 @@ public class UsuariosController {
         }
     }
 
+//
+    @Operation(
+        summary = "Registrar usuario",
+        description = "Registra un usuario"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario registrado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @PostMapping
     public ResponseEntity<Usuario> registrarUsuario(@RequestBody Usuario usuario, HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -92,6 +159,18 @@ public class UsuariosController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
+//
+    @Operation(
+        summary = "Actualizar Usuario",
+        description = "Actualiza un usuario según su id"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario actualizado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
 
     @PutMapping("/id/{id}")
     public ResponseEntity<Usuario> actualizarUsuario(@RequestBody Usuario usuario, @PathVariable Long id, HttpServletRequest request) {
@@ -114,6 +193,18 @@ public class UsuariosController {
         }
     }
 
+//
+@Operation(
+        summary = "Activar Usuario",
+        description = "Activa un usuario según su rol"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario activado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @PutMapping("/id/{id}/activar")
     public ResponseEntity<Usuario> activarUsuario(@PathVariable Long id, HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -127,6 +218,18 @@ public class UsuariosController {
         }
     }
 
+//
+    @Operation(
+        summary = "Desactivar Usuario",
+        description = "Desactiva un usuario según su rol"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario desactivado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @PutMapping("/id/{id}/desactivar")
     public ResponseEntity<Usuario> desactivarUsuario(@PathVariable Long id, HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -139,6 +242,18 @@ public class UsuariosController {
             return ResponseEntity.notFound().build();
         }
     }
+
+//
+@Operation(
+        summary = "Cambiar rol de Usuario",
+        description = "Cambia el rol un usuario según su rut"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Rol actualizado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
 
     @PutMapping("/id/{id}/{nombreRol}")
     public ResponseEntity<Usuario> cambiarRolUsuario(@PathVariable Long id, @PathVariable String nombreRol, HttpServletRequest request) {
@@ -155,6 +270,18 @@ public class UsuariosController {
         }
     }
 
+//
+    @Operation(
+        summary = "Eliminar Usuario",
+        description = "Elimina un usuario según su id"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario eliminado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @DeleteMapping("/id/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long id, HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -166,9 +293,21 @@ public class UsuariosController {
         }
     }
 
+//
+    @Operation(
+        summary = "Cambia Contraseña Usuario",
+        description = "Cambia contraseña de un usuario"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Contraseña cambiada correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @PutMapping("/{id}/cambiar-password")
     public ResponseEntity<String> cambiarPassword(@PathVariable Long id,
-                                                  @RequestBody Map<String, String> datos) {
+            @RequestBody Map<String, String> datos) {
         String nueva = datos.get("nuevaContrasena");
         String confirmar = datos.get("confirmarContrasena");
         try {
@@ -180,6 +319,18 @@ public class UsuariosController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+//
+    @Operation(
+        summary = "Ver perfil usuario",
+        description = "Ver usuario según su id"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Se buscó el perfil correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
 
     @GetMapping("/perfil")
     public ResponseEntity<UsuarioPerfil> verPerfil(HttpServletRequest request) {
@@ -196,9 +347,21 @@ public class UsuariosController {
         return ResponseEntity.ok(dto);
     }
 
+//
+    @Operation(
+        summary = "Actualizar perfil Usuario",
+        description = "Actualiza el perfil de un usuario según su rut"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Usuario activado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+//
+
     @PutMapping("/perfil")
     public ResponseEntity<UsuarioPerfil> actualizarPerfil(@RequestBody UsuarioPerfil nuevosDatos,
-                                                           HttpServletRequest request) {
+        HttpServletRequest request) {
         Long idUsuario = roleValidator.getUserId(request);
         Usuario usuario = usuarioService.findById(idUsuario);
         usuario.setRut(nuevosDatos.getRut());

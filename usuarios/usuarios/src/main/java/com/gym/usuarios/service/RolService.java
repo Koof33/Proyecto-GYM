@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.gym.usuarios.model.Rol;
+import com.gym.usuarios.model.Enum.NombreRol;
 import com.gym.usuarios.repository.RolRepository;
 
 import jakarta.transaction.Transactional;
@@ -24,7 +25,7 @@ public class RolService {
         return rolRepository.findById(id).orElseThrow(()-> new RuntimeException("Rol no encontrado con ID: "+ id));
     }
 
-    public Rol findByNombre(String nombreRol){
-        return rolRepository.findByNombre(nombreRol);
+    public Rol findByNombre(String nombreRol) {
+        return rolRepository.findByNombre(NombreRol.valueOf(nombreRol.toUpperCase()));
     }
 }

@@ -1,4 +1,4 @@
-package com.gym.resena.config;
+package com.gym.resena;
 
 import com.gym.resena.model.Resena;
 import com.gym.resena.repository.ResenaRepository;
@@ -13,7 +13,7 @@ import java.util.List;
 
 @Configuration
 @RequiredArgsConstructor
-public class Carga {
+public class DataLoader {
 
     @Bean
     public CommandLineRunner precargarResenas(ResenaRepository resenaRepo) {
