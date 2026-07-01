@@ -4,6 +4,9 @@ import com.gym.usuarios.model.Rol;
 import com.gym.usuarios.security.RoleValidator;
 import com.gym.usuarios.service.RolService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +25,20 @@ public class RolesController {
     @Autowired
     private RolService rolService;
 
+//
+
+    @Operation(
+        summary = "Mostrar roles",
+        description = "Mostrar todos los roles"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Roles mostrados correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
+
     @GetMapping
     public ResponseEntity<List<Rol>> mostrarRoles(HttpServletRequest request){
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -31,6 +48,20 @@ public class RolesController {
         }
         return ResponseEntity.ok(roles);
     }
+
+//
+
+    @Operation(
+        summary = "Mostrar rol",
+        description = "Muestra el rol de un usuario según su ID"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Roles mostrados correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
 
     @GetMapping("/id/{id}")
     public ResponseEntity<?> mostrarRol(@PathVariable Long id, HttpServletRequest request){
@@ -42,6 +73,20 @@ public class RolesController {
             return ResponseEntity.notFound().build();
         }
     }
+
+//
+
+    @Operation(
+        summary = "Buscar rol",
+        description = "Buscar por nombre de rol"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Roles mostrados correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
 
     @GetMapping("/nombre/{nombreRol}")
     public ResponseEntity<?> buscarRolNombre(@PathVariable String nombreRol, HttpServletRequest request){
