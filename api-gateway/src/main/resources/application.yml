@@ -1,0 +1,94 @@
+# Puerto donde se ejecutará el API Gateway
+server:
+  port: 8090
+
+spring:
+  application:
+    # Nombre con el que el Gateway se registrará en Eureka
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            # Ruta que redirige peticiones al microservicio USUARIOS
+            - id: ruta-usuarios
+              # lb:// indica que Eureka buscará automáticamente
+              # la ubicación del servicio USUARIOS
+              uri: lb://USUARIOS
+              predicates:
+                # Todas las solicitudes que comiencen con /usuarios
+                # serán enviadas al microservicio USUARIOS
+                - Path=/usuarios/**
+
+            # Ruta que redirige peticiones al microservicio AUTENTICACION
+            - id: ruta-autenticacion
+              uri: lb://AUTENTICACION
+              predicates:
+                - Path=/autenticacion/**
+
+            # Ruta que redirige peticiones al microservicio MEMBRESIAS
+            - id: ruta-membresias
+              uri: lb://MEMBRESIAS
+              predicates:
+                - Path=/membresias/**
+
+            # Ruta que redirige peticiones al microservicio RESERVAS
+            - id: ruta-reservas
+              uri: lb://RESERVAS
+              predicates:
+                - Path=/reservas/**
+
+            # Ruta que redirige peticiones al microservicio CLASES
+            - id: ruta-clases
+              uri: lb://CLASES
+              predicates:
+                - Path=/clases/**
+
+            # Ruta que redirige peticiones al microservicio SERVICIOS
+            - id: ruta-servicios
+              uri: lb://SERVICIOS
+              predicates:
+                - Path=/servicios/**
+
+            # Ruta que redirige peticiones al microservicio GESTIONPERFIL
+            - id: ruta-gestionperfil
+              uri: lb://GESTIONPERFIL
+              predicates:
+                - Path=/gestionperfil/**
+
+            # Ruta que redirige peticiones al microservicio SOPORTE
+            - id: ruta-soporte
+              uri: lb://SOPORTE
+              predicates:
+                - Path=/soporte/**
+
+            # Ruta que redirige peticiones al microservicio RESENA
+            - id: ruta-resena
+              uri: lb://RESENA
+              predicates:
+                - Path=/resena/**
+
+# Configuración de conexión con Eureka Server
+eureka:
+  client:
+    # Permite que el Gateway se registre en Eureka
+    register-with-eureka: true
+    # Permite que el Gateway consulte el catálogo de servicios
+    fetch-registry: true
+    # Dirección donde se encuentra Eureka Server
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: 127.0.0.1
+    instance-id: 127.0.0.1:${spring.application.name}:${server.port}
+
+# Activa mensajes detallados del Gateway en la consola
+# Muy útil para depuración y pruebas
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.servlet: DEBUG
