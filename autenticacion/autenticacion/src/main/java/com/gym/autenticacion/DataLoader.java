@@ -46,19 +46,19 @@ public class DataLoader {
             // Usuarios - protegidos por correo Y por try-catch para evitar
             // duplicados de RUT si el usuario ya existe desde otro microservicio
             insertarUsuario(usuarioRepo, rolRepo, estadoUsuarioRepo, encoder,
-                "12345678-9", "Admin",      "Sys",     "Admin",     "One",
+                "11111111-1", "Admin",      "Sys",     "Admin",     "One",
                 "admin@gimnasio.com",       "admin123",       NombreRol.ADMINISTRADOR);
 
             insertarUsuario(usuarioRepo, rolRepo, estadoUsuarioRepo, encoder,
-                "98765432-1", "Cliente",   "Ejemplo", "Perez",     "Lopez",
+                "22222222-2", "Cliente",   "Ejemplo", "Perez",     "Lopez",
                 "cliente@gimnasio.com",     "cliente123",     NombreRol.CLIENTE);
 
             insertarUsuario(usuarioRepo, rolRepo, estadoUsuarioRepo, encoder,
-                "11223344-5", "Soporte",   "Ejemplo", "Ramirez",   "Mena",
+                "33333333-3", "Soporte",   "Ejemplo", "Ramirez",   "Mena",
                 "soporte@gimnasio.com",     "soporte123",     NombreRol.SOPORTE);
 
             insertarUsuario(usuarioRepo, rolRepo, estadoUsuarioRepo, encoder,
-                "55667788-0", "Entrenador","Ejemplo", "Diaz",      "Vega",
+                "44444444-4", "Entrenador","Ejemplo", "Diaz",      "Vega",
                 "entrenador@gimnasio.com",  "entrenador123",  NombreRol.ENTRENADOR);
         };
     }

@@ -1,0 +1,287 @@
+version: '3.8'
+
+# ── Red compartida ────────────────────────────────────────────────────────────
+# Todos los servicios se comunican entre sí usando el nombre del servicio como host.
+# Ejemplo: el gateway llama a http://eureka-server:8761/eureka/
+networks:
+  gym-network:
+    driver: bridge
+
+# ── Volumen para persistir datos MySQL ────────────────────────────────────────
+volumes:
+  mysql-data:
+
+services:
+
+  # ── MySQL ──────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    container_name: gym-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: gym_user
+      MYSQL_PASSWORD: gym_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    networks:
+      - gym-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # ── Eureka Server ──────────────────────────────────────────────────────────
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: gym-eureka
+    ports:
+      - "8761:8761"
+    environment:
+      - SERVER_PORT=8761
+      - EUREKA_CLIENT_REGISTER_WITH_EUREKA=false
+      - EUREKA_CLIENT_FETCH_REGISTRY=false
+    networks:
+      - gym-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+
+  # ── Microservicio: usuarios ────────────────────────────────────────────────
+  usuarios:
+    build:
+      context: ./usuarios/usuarios
+      dockerfile: Dockerfile
+    container_name: gym-usuarios
+    ports:
+      - "8080:8080"
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/usuario?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── Microservicio: autenticacion ───────────────────────────────────────────
+  autenticacion:
+    build:
+      context: ./autenticacion/autenticacion
+      dockerfile: Dockerfile
+    container_name: gym-autenticacion
+    ports:
+      - "8081:8081"
+    environment:
+      - SERVER_PORT=8081
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/usuario?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JWT_SECRET=gym-secret-key-must-be-at-least-32-chars-long!
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      usuarios:
+        condition: service_started
+    networks:
+      - gym-network
+
+  # ── Microservicio: membresias ──────────────────────────────────────────────
+  membresias:
+    build:
+      context: ./membresias/membresias
+      dockerfile: Dockerfile
+    container_name: gym-membresias
+    ports:
+      - "8082:8082"
+    environment:
+      - SERVER_PORT=8082
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/membresia?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── Microservicio: reservas ────────────────────────────────────────────────
+  reservas:
+    build:
+      context: ./reservas/reservas
+      dockerfile: Dockerfile
+    container_name: gym-reservas
+    ports:
+      - "8083:8083"
+    environment:
+      - SERVER_PORT=8083
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/reserva?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── Microservicio: clases ──────────────────────────────────────────────────
+  clases:
+    build:
+      context: ./clases/clases
+      dockerfile: Dockerfile
+    container_name: gym-clases
+    ports:
+      - "8084:8084"
+    environment:
+      - SERVER_PORT=8084
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/clase?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── Microservicio: servicios ───────────────────────────────────────────────
+  servicios:
+    build:
+      context: ./servicios/servicios
+      dockerfile: Dockerfile
+    container_name: gym-servicios
+    ports:
+      - "8085:8085"
+    environment:
+      - SERVER_PORT=8085
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/servicio?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── Microservicio: gestionperfil ───────────────────────────────────────────
+  gestionperfil:
+    build:
+      context: ./gestionperfil/gestionperfil
+      dockerfile: Dockerfile
+    container_name: gym-gestionperfil
+    ports:
+      - "8086:8086"
+    environment:
+      - SERVER_PORT=8086
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/bloque_disponibilidad?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - USUARIOS_URL=http://usuarios:8080
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+      usuarios:
+        condition: service_started
+    networks:
+      - gym-network
+
+  # ── Microservicio: soporte ─────────────────────────────────────────────────
+  soporte:
+    build:
+      context: ./soporte/soporte
+      dockerfile: Dockerfile
+    container_name: gym-soporte
+    ports:
+      - "8087:8087"
+    environment:
+      - SERVER_PORT=8087
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/ticket?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── Microservicio: resena ──────────────────────────────────────────────────
+  resena:
+    build:
+      context: ./resena
+      dockerfile: Dockerfile
+    container_name: gym-resena
+    ports:
+      - "8088:8088"
+    environment:
+      - SERVER_PORT=8088
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysql:3306/resena?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      - SPRING_DATASOURCE_USERNAME=gym_user
+      - SPRING_DATASOURCE_PASSWORD=gym_pass
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+    depends_on:
+      mysql:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network
+
+  # ── API Gateway ────────────────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    container_name: gym-gateway
+    ports:
+      - "8090:8090"
+    environment:
+      - SERVER_PORT=8090
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - EUREKA_INSTANCE_PREFER_IP_ADDRESS=true
+      - JWT_SECRET=gym-secret-key-must-be-at-least-32-chars-long!
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - gym-network

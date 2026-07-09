@@ -102,12 +102,12 @@ class ServicioControllerTest {
 
     @Test
     void actualizar_servicioExistente_retorna200() {
-        when(servicioService.actualizar(1L, "Yoga", "Nueva descripcion")).thenReturn(servicio);
+        when(servicioService.actualizar(1L, "Yoga", "Clase de yoga para todos los niveles")).thenReturn(servicio);
 
         ResponseEntity<Servicio> response = servicioController.actualizar(1L, servicio, request);
 
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        verify(validator).requireRole(request, "ADMINISTRADOR");
+            assertEquals(HttpStatus.OK, response.getStatusCode());
+            verify(validator).requireRole(request, "ADMINISTRADOR");
     }
 
     // ───────────────────────── desactivarServicio ─────────────────────────

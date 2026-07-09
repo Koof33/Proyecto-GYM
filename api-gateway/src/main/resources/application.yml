@@ -1,0 +1,102 @@
+server:
+  port: 8090
+a
+spring:
+  application:
+    name: api-gateway
+
+  cloud:
+    gateway:
+      server:
+        webmvc:
+          routes:
+            - id: ruta-usuarios
+              uri: lb://USUARIOS
+              predicates:
+                - Path=/usuarios/**
+
+            - id: ruta-roles
+              uri: lb://USUARIOS
+              predicates:
+                - Path=/api/roles/**
+
+            - id: ruta-autenticacion
+              uri: lb://AUTENTICACION
+              predicates:
+                - Path=/autenticacion/**
+
+            - id: ruta-membresias
+              uri: lb://MEMBRESIAS
+              predicates:
+                - Path=/membresias/**
+
+            - id: ruta-planes
+              uri: lb://MEMBRESIAS
+              predicates:
+                - Path=/planes/**
+
+            - id: ruta-incluidos
+              uri: lb://MEMBRESIAS
+              predicates:
+                - Path=/incluidos/**
+
+            - id: ruta-reservas
+              uri: lb://RESERVAS
+              predicates:
+                - Path=/reservas/**
+
+            - id: ruta-clases
+              uri: lb://CLASES
+              predicates:
+                - Path=/clases/**
+
+            - id: ruta-inscripciones
+              uri: lb://CLASES
+              predicates:
+                - Path=/inscripciones/**
+
+            - id: ruta-servicios
+              uri: lb://SERVICIOS
+              predicates:
+                - Path=/servicios/**
+
+            - id: ruta-gestionperfil
+              uri: lb://GESTIONPERFIL
+              predicates:
+                - Path=/perfil/**
+
+            - id: ruta-soporte
+              uri: lb://SOPORTE
+              predicates:
+                - Path=/soporte/**
+
+            - id: ruta-historial
+              uri: lb://SOPORTE
+              predicates:
+                - Path=/historial/**
+
+            - id: ruta-resena
+              uri: lb://RESENA
+              predicates:
+                - Path=/resenas/**
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    prefer-ip-address: true
+    ip-address: 127.0.0.1
+    hostname: 127.0.0.1
+    instance-id: 127.0.0.1:${spring.application.name}:${server.port}
+
+# Debe ser EXACTAMENTE igual al jwt.secret del microservicio autenticacion
+jwt:
+  secret: gym-secret-key-must-be-at-least-32-chars-long!
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.web.servlet: DEBUG
