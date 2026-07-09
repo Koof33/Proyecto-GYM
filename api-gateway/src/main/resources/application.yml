@@ -1,6 +1,6 @@
 server:
   port: 8090
-a
+
 spring:
   application:
     name: api-gateway

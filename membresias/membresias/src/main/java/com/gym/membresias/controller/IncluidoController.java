@@ -4,6 +4,9 @@ import com.gym.membresias.model.Incluido;
 import com.gym.membresias.security.RoleValidator;
 import com.gym.membresias.service.IncluidoService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,6 +24,20 @@ public class IncluidoController {
     @Autowired
     private IncluidoService incluidoService;
 
+//
+
+    @Operation(
+        summary = "Lista por plan",
+        description = "Lista el plan disponible"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista obtenida correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
+
     @GetMapping("/plan/{idPlan}")
     public ResponseEntity<List<Incluido>> listarPorPlan(@PathVariable Long idPlan, HttpServletRequest request) {
         List<Incluido> incluidos = incluidoService.listarPorPlan(idPlan);
@@ -29,6 +46,20 @@ public class IncluidoController {
         }
         return ResponseEntity.ok(incluidos);
     }
+
+//
+
+    @Operation(
+        summary = "Crear incluido",
+        description = "Crear incluido"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Incluido creado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
 
     @PostMapping
     public ResponseEntity<Incluido> crearIncluido(@RequestBody Incluido incluido, HttpServletRequest request) {
@@ -42,6 +73,20 @@ public class IncluidoController {
         }
     }
 
+//
+
+    @Operation(
+        summary = "Eliminar incluido",
+        description = "Elimina un incluido en el plan"
+)
+@ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Incluido Eliminado correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos invalidos")  ,
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+})
+
+//
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminarIncluido(@PathVariable Long id, HttpServletRequest request) {
         roleValidator.requireRole(request, "ADMINISTRADOR");
@@ -53,4 +98,3 @@ public class IncluidoController {
         }
     }
 }
-
