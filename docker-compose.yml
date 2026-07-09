@@ -22,7 +22,7 @@ services:
       MYSQL_USER: gym_user
       MYSQL_PASSWORD: gym_pass
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql-data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
